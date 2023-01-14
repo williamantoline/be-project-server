@@ -1,5 +1,7 @@
+const data = require("../data.json");
+
 const test = (req, res) => {
-    res.send(r);
+    res.send(data);
 }
 
 module.exports = { test }
