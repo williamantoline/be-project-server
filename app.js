@@ -8,10 +8,22 @@ app.use(cors());
 
 app.use(express.json());
 
+const mysql = require('mysql');
+const conn = mysql.createConnection({
+    host: process.env.MYSQL_DB_HOST,
+    port: process.env.MYSQL_DB_PORT,
+    user: process.env.MYSQL_DB_USER,
+    password: process.env.MYSQL_DB_PASSWORD,
+    database: process.env.MYSQL_DB_NAME,
+});
+conn.connect();
+
+
 
 // main routing
 const routes = require("./routes");
 app.use(routes);
+
 
 // handle 404
 app.use((req, res, next) => {
@@ -36,3 +48,4 @@ const host = process.env.HOST || '127.0.0.1';
 const port = process.env.PORT || 3000;
 app.listen(port, host);
 console.log(`Running on http://${host}:${port}`);
+conn.end()
