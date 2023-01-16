@@ -5,6 +5,7 @@ const testController = require("./controllers/testController");
 
 
 router.get('/api/test', testController.test);
+router.get('/api/test-db', testController.testDb);
 
 
 module.exports = router;
