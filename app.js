@@ -16,7 +16,6 @@ conn.connect();
 const routes = require("./routes");
 app.use(routes);
 
-
 // handle 404
 app.use((req, res, next) => {
     res.status(404);
