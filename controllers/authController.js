@@ -1,4 +1,5 @@
 const conn = require("../db");
+const model = require("../models/index")
 
 const getUser = async (username) => {
   conn.query(`SELECT * FROM users WHERE username='${username}'`, (err, result) => {
@@ -7,8 +8,10 @@ const getUser = async (username) => {
   })
 }
 
-const register = (req, res) => {
-  res.send('register');
+const register = async (req, res) => {
+  const { name, username, email, password } = req.body;
+  await model.users.create({name, username, email, password});
+  res.send("Berhasil Menambahkan Data user").status(200)
 }
 
 const login = async (req, res) => {

@@ -41,7 +41,6 @@ const authRoutes = require("./routes/auth");
 app.use(testRoutes);
 app.use(authRoutes);
 
-
 // handle 404
 app.use((req, res, next) => {
     res.status(404);
@@ -51,12 +50,12 @@ app.use((req, res, next) => {
 });
 
 // handle error
-app.use((err, req, res, next) => {
-    res.status(500);
-    res.send({
-        message: 'Internal Server Error'
-    });
-});
+// app.use((err, req, res, next) => {
+//     res.status(500);
+//     res.send({
+//         message: 'Internal Server Error'
+//     });
+// });
 
 
 // test push
