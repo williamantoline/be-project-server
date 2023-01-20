@@ -8,13 +8,39 @@ app.use(cors());
 
 app.use(express.json());
 
-const conn = require("./db");
-conn.connect();
+
+// const conn = require("./db");
+// conn.connect();
+
+const db = require("./models");
+
+db.sequelize.sync()
+    .then(() => {
+        console.log("Synced db.");
+    })
+    .catch((err) => {
+        console.log("Failed to sync db: " + err.message);
+    });
+
+
+// const user = {
+//     name: 'user',
+//     email: 'abc@gmail.com',
+//     username: 'abc',
+//     password: 'random',
+// };
+
+// const User = db.users;
+// User.create(user)
+//     .then(() => console.log('abc'));
 
 
 // main routing
-const routes = require("./routes");
-app.use(routes);
+const testRoutes = require("./routes/test");
+const authRoutes = require("./routes/auth");
+app.use(testRoutes);
+app.use(authRoutes);
+
 
 // handle 404
 app.use((req, res, next) => {
