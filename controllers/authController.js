@@ -1,5 +1,5 @@
 const conn = require("../db");
-const model = require("../models/index")
+const model = require("../models/index");
 
 const getUser = async (username) => {
   conn.query(`SELECT * FROM users WHERE username='${username}'`, (err, result) => {
