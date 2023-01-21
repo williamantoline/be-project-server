@@ -14,12 +14,12 @@ const register = async (req, res) => {
   const saltRounds = 10;
   bcrypt.hash(password, saltRounds, async (err, password) => {
     if(err){
-      res.send("Gagal Menambahkan Data User").status(400);
+      return res.send("Gagal Menambahkan Data User").status(400);
     }
     if(password){
       console.log(password)
       await model.users.create({name, username, email, password});
-      res.send("Berhasil Menambahkan Data User").status(200);
+      return res.send("Berhasil Menambahkan Data User").status(200);
     }
   });
 }
@@ -35,12 +35,15 @@ const login = async (req, res) => {
     })
   }
 
-  if(user.password !== password){
-    return res.status(403).json({
-      message: 'Wrong Password',
-      error: "invalid login",
-    });
-  }
+  bcrypt.compare(password, user.password, (err, result) => {
+    if(err) throw err;
+    if(!result){
+      return res.status(403).json({
+        message: 'Wrong Password',
+        error: "invalid login",
+      });
+    }
+  })
 
   const token = jwt.sign(user, process.env.MY_SECRET, { expiresIn: "1h" });
 
@@ -53,11 +56,11 @@ const login = async (req, res) => {
 }
 
 const revoke = (req, res) => {
-  res.send("revoke")
+  return res.send("revoke")
 }
 
 const me = (req, res) => {
-  res.send("me")
+  return res.send("me")
 }
 
 module.exports = { register, login, revoke, me }
