@@ -1,3 +1,4 @@
+const bcrypt = require('bcrypt');
 const conn = require("../db");
 const model = require("../models/index");
 
@@ -10,8 +11,17 @@ const getUser = async (username) => {
 
 const register = async (req, res) => {
   const { name, username, email, password } = req.body;
-  await model.users.create({name, username, email, password});
-  res.send("Berhasil Menambahkan Data user").status(200)
+  const saltRounds = 10;
+  bcrypt.hash(password, saltRounds, async (err, password) => {
+    if(err){
+      res.send("Gagal Menambahkan Data User").status(400);
+    }
+    if(password){
+      console.log(password)
+      await model.users.create({name, username, email, password});
+      res.send("Berhasil Menambahkan Data User").status(200);
+    }
+  });
 }
 
 const login = async (req, res) => {
