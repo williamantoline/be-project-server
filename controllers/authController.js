@@ -64,10 +64,7 @@ const login = async (req, res) => {
 }
 
 const revoke = (req, res) => {
-  res.cookie.clear();
-  res.status(200).json({
-    message: 'ok',
-  });
+  return res.status(204).end();
 }
 
 const me = async (req, res) => {
