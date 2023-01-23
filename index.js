@@ -7,7 +7,10 @@ app.use(cookieParser());
 require('dotenv').config();
 
 const cors = require("cors");
-app.use(cors());
+app.use(cors({
+    credentials: true,
+    origin: 'http://localhost:3000'
+}));
 
 app.use(express.json());
 
