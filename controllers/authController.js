@@ -1,12 +1,12 @@
 const bcrypt = require('bcrypt');
-const conn = require("../db");
+const jwt = require('jsonwebtoken');
 const model = require("../models/index");
 
+require('dotenv').config();
+
 const getUser = async (username) => {
-  conn.query(`SELECT * FROM users WHERE username='${username}'`, (err, result) => {
-    if(err) return false
-    return result
-  })
+  const user = await model.users.findOne({where: {username: username}});
+  return user;
 }
 
 const register = async (req, res) => {
@@ -45,7 +45,7 @@ const login = async (req, res) => {
     }
   })
 
-  const token = jwt.sign(user, process.env.MY_SECRET, { expiresIn: "1h" });
+  const token = jwt.sign(user.toJSON(), process.env.SECRET_KEY, { expiresIn: "1h" });
 
   res.cookie("token", token, {
     httpOnly: true,
