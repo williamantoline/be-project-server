@@ -1,8 +1,10 @@
+require("dotenv").config();
+
 module.exports = {
-    HOST: 'localhost',
-    USER: 'root',
-    PASSWORD: '',
-    DB: 'notes_app',
+    HOST: process.env.MYSQL_HOST,
+    USER: process.env.MYSQL_DB_USERNAME,
+    PASSWORD: process.env.MYSQL_DB_PASSWORD,
+    DB: process.env.MYSQL_DB_NAME,
     dialect: 'mysql',
     pool: {
         max: 5,
