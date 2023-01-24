@@ -44,8 +44,10 @@ db.sequelize.sync()
 // main routing
 const testRoutes = require("./routes/test");
 const authRoutes = require("./routes/auth");
+const notesRoutes = require("./routes/notes")
 app.use(testRoutes);
 app.use(authRoutes);
+app.use(notesRoutes);
 
 // handle 404
 app.use((req, res, next) => {
@@ -56,17 +58,14 @@ app.use((req, res, next) => {
 });
 
 // handle error
-// app.use((err, req, res, next) => {
-//     res.status(500);
-//     res.send({
-//         message: 'Internal Server Error'
-//     });
-// });
-
-
-// test push
+app.use((err, req, res, next) => {
+    res.status(500);
+    res.send({
+        message: 'Internal Server Error'
+    });
+});
 
 const host = process.env.HOST || '127.0.0.1';
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3013;
 app.listen(port);
 console.log(`Running on http://${host}:${port}`);

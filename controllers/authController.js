@@ -46,7 +46,7 @@ const login = async (req, res) => {
     }
   })
 
-  const token = jwt.sign(user.toJSON(), process.env.SECRET_KEY, { expiresIn: "1h" });
+  const token = jwt.sign(user.toJSON(), process.env.JWT_KEY, { expiresIn: "1h" });
 
   res.cookie("token", token, {
     httpOnly: true,
@@ -64,3 +64,5 @@ const revoke = (req, res) => {
 const me = async (req, res) => {
   return res.json("me");
 }
+
+module.exports = { register, login, revoke, me }
