@@ -22,11 +22,20 @@ db.users = require("./user.model.js")(sequelize, Sequelize);
 db.tests = require("./test.model.js")(sequelize, Sequelize);
 db.notes = require("./note.model.js")(sequelize, Sequelize);
 db.todos = require("./todo.model.js")(sequelize, Sequelize);
+db.todo_items = require("./todo_item.js")(sequelize, Sequelize);
 
 db.users.hasMany(db.todos, { as: "todos" });
 db.todos.belongsTo(db.users, {
   foreignKey: "userId",
   as: "user",
 });
+
+db.todos.hasMany(db.todo_items, {as: "todo_items"});
+db.todo_items.belongsTo(db.todos, {
+  foreignKey: "todoId",
+  as: "todo",
+})
+
+
 
 module.exports = db;
