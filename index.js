@@ -45,9 +45,11 @@ db.sequelize.sync()
 // const testRoutes = require("./routes/test");
 const authRoutes = require("./routes/auth");
 const noteRoutes = require("./routes/note");
+const todoRoutes = require("./routes/todo")
 // app.use(testRoutes);
 app.use(authRoutes);
 app.use(noteRoutes); 
+app.use(todoRoutes); 
 
 // handle 404
 app.use((req, res, next) => {
