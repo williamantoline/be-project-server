@@ -48,21 +48,19 @@ const login = async (req, res) => {
     })
   }
 
-  bcrypt.compare(password, user.password, (err, result) => {
-    if(err) throw err;
-    if(!result){
-      return res.status(403).json({
-        message: 'Wrong Password',
-        error: "invalid login",
-      });
-    }
-  })
+  const status = await bcrypt.compare(password, user.password)
+  if(!status){
+    return res.status(403).json({
+      message: 'Wrong Password',
+      error: 'invalid login'
+    })
+  }
 
   const token = jwt.sign(user.toJSON(), process.env.JWT_KEY, { expiresIn: "24h" });
 
   res.cookie("token", token, {
     httpOnly: true,
-    secure: true,
+    secure: false,
     sameSite: "None"
   });
 
