@@ -60,7 +60,7 @@ const login = async (req, res) => {
     sameSite: "None"
   });
 
-  return res.json({message: 'ok'});
+  return res.json({token: token});
 }
 
 const revoke = (req, res) => {
@@ -68,7 +68,8 @@ const revoke = (req, res) => {
 }
 
 const me = async (req, res) => {
-  return res.json("me")
+  const data = await model.users.findAll();
+  return res.json({data: data});
 }
 
 module.exports = { register, login, revoke, me }
