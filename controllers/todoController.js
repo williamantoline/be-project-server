@@ -19,8 +19,7 @@ exports.store = async (req, res) => {
         if (!user) {
             res.status(404).end();
         }
-
-        const todo = await Todo.create({userId: user.id, title, isLiked: false});
+        const todo = await Todo.create({ title, isLiked: false, userId: user.id,});
         res.status(201).json({
             message: "Store todo success",
             data: todo,
