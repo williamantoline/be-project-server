@@ -46,13 +46,7 @@ const login = async (req, res) => {
     }
   })
 
-  user = {
-    username: user.username,
-    name: user.name,
-    email: user.email
-  }
-
-  const token = jwt.sign(user, process.env.JWT_KEY, { expiresIn: "1h" });
+  const token = jwt.sign(user.toJSON(), process.env.JWT_KEY, { expiresIn: "1h" });
 
   res.cookie("token", token, {
     httpOnly: true,
@@ -68,8 +62,7 @@ const revoke = (req, res) => {
 }
 
 const me = async (req, res) => {
-  const data = await model.users.findAll();
-  return res.json({data: data});
+  return res.json("me");
 }
 
 module.exports = { register, login, revoke, me }

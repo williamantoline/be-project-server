@@ -58,17 +58,14 @@ app.use((req, res, next) => {
 });
 
 // handle error
-// app.use((err, req, res, next) => {
-//     res.status(500);
-//     res.send({
-//         message: 'Internal Server Error'
-//     });
-// });
-
-
-// test push
+app.use((err, req, res, next) => {
+    res.status(500);
+    res.send({
+        message: 'Internal Server Error'
+    });
+});
 
 const host = process.env.HOST || '127.0.0.1';
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3013;
 app.listen(port);
 console.log(`Running on http://${host}:${port}`);
