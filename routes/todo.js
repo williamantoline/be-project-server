@@ -9,7 +9,7 @@ router.post('/api/todosFile', todoController.storeFile);
 router.post('/api/todosItem', todoController.storeTodo);
 router.put('/api/todosFile/:id', todoController.updateTitle);
 router.put('/api/todosItem/:id', todoController.updateTodo);
-router.patch('/api/todos/:id/update-isliked', todoController.updateLike);
+router.patch('/api/todos/:id/update-isChecked', todoController.updateCheck);
 router.delete('/api/todos/:id', todoController.destroy);
 
 module.exports = router;
