@@ -5,7 +5,8 @@ const Note = model.notes;
 exports.index = async (req, res) => {
     const token = req.headers.authorization;
     const user = jwt.verify(token, process.env.JWT_KEY);
-    const notes = await Note.findAll({ where: {userId: user.userId} });
+    console.log(user)
+    const notes = await Note.findAll({ where: {userId: user.id} });
     return res.status(200).json({data: notes});
 }
 
