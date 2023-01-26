@@ -1,7 +1,7 @@
 const { sequelize, Sequelize } = require(".");
 
 module.exports = (sequelize, Sequelize) => {
-    const Todo = sequelize.define("todo", {
+    const TodoItem = sequelize.define("todoItem", {
         id: {
             type: Sequelize.UUID,
             defaultValue: Sequelize.UUIDV4,
@@ -16,5 +16,5 @@ module.exports = (sequelize, Sequelize) => {
             allowNull: false
         }
     });
-    return Todo;
+    return TodoItem;
 }

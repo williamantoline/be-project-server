@@ -22,7 +22,7 @@ db.users = require("./user.model.js")(sequelize, Sequelize);
 db.tests = require("./test.model.js")(sequelize, Sequelize);
 db.notes = require("./note.model.js")(sequelize, Sequelize);
 db.todos = require("./todo.model.js")(sequelize, Sequelize);
-db.todo_items = require("./todo_item.js")(sequelize, Sequelize);
+db.todo_items = require("./todo_item.model.js")(sequelize, Sequelize);
 
 db.users.hasMany(db.notes, { as: "notes" });
 db.notes.belongsTo(db.users, {
