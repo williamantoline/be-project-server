@@ -1,9 +1,12 @@
 const model = require("../models/index");
+const jwt = require("jsonwebtoken");
 const Note = model.notes;
 const User = model.users;
 
 exports.index = async (req, res) => {
-    const notes = await Note.findAll();
+    const token = req.headers.authorization;
+    const user = jwt.verify(token, process.env.JWT_KEY);
+    const notes = await Note.findAll({ where: {userId: user.userId} });
     return res.status(200).json({data: notes});
 }
 

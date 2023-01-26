@@ -1,15 +1,21 @@
 const model = require("../models/index");
+const jwt = require("jsonwebtoken");
 const Todo = model.todos;
 const User = model.users;
+const TodoItem = model.todo_items
 
 exports.index = async (req, res) => {
-    const todos= await Todo.findAll();
+    const token = req.headers.authorization;
+    const user = jwt.verify(token, process.env.JWT_KEY);
+    const todos = await Todo.findAll({
+        where: {userId: user.userId},
+    });
     return res.status(200).json({data: todos});
 }
 
 exports.show = async (req, res) => {
-    const todo = await Todo.findOne({where: {id: req.params.id}});
-    return res.status(200).json({data: todo});
+    const todoItems = await TodoItem.findAll({where: {todoId: req.params.id}});
+    return res.status(200).json({data: todoItems});
 }
 
 exports.store = async (req, res) => {
@@ -73,7 +79,7 @@ exports.destroy = async (req, res) => {
     try {
         const { id } = req.params;
         await Todo.destroy({where: {id: id}});
-
+        await TodoItem.destroy({where: {todoId: id}})
         res.status(200).json({
             message: "Delete todo success",
         });
