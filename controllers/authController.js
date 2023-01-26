@@ -66,7 +66,7 @@ const login = async (req, res) => {
     sameSite: "None"
   });
 
-  return res.json({message: 'ok'});
+  return res.json({token: token});
 }
 
 const revoke = (req, res) => {
