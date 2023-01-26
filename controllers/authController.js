@@ -11,6 +11,18 @@ const getUser = async (username) => {
   return user;
 }
 
+const cookieJwtAuth = (req, res) => {
+  console.log(req.headers)
+  const token = req.headers.authorization;
+  console.log(token)
+  console.log('CheckToken Active')
+  if(!token){
+    return res.json({tokenStatus: false}).status(200);
+  }else{
+    return res.json({tokenStatus: true}).status(200);
+  }
+}
+
 const register = async (req, res) => {
   const { name, username, email, password } = req.body;
   const saltRounds = 10;
@@ -46,13 +58,7 @@ const login = async (req, res) => {
     }
   })
 
-  user = {
-    username: user.username,
-    name: user.name,
-    email: user.email
-  }
-
-  const token = jwt.sign(user, process.env.JWT_KEY, { expiresIn: "1h" });
+  const token = jwt.sign(user.toJSON(), process.env.JWT_KEY, { expiresIn: "1h" });
 
   res.cookie("token", token, {
     httpOnly: true,
@@ -60,7 +66,7 @@ const login = async (req, res) => {
     sameSite: "None"
   });
 
-  return res.json({message: 'ok'});
+  return res.json({token: token});
 }
 
 const revoke = (req, res) => {
@@ -68,7 +74,7 @@ const revoke = (req, res) => {
 }
 
 const me = async (req, res) => {
-  return res.json("me")
+  return res.json("me");
 }
 
-module.exports = { register, login, revoke, me }
+module.exports = { register, login, revoke, me, cookieJwtAuth }
