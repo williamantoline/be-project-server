@@ -9,18 +9,6 @@ exports.validateUser = [
     .withMessage('Name must have a minimum length of 3').bail()
     .isAlpha()
     .withMessage("The name should contain only letters").bail(),
-  check('username')
-    .notEmpty()
-    .withMessage('Username is required').bail()
-    .isLength({ min: 3, max: 255 })
-    .withMessage('Username must have a minimum length of 3').bail()
-    .custom(value => {
-      return model.users.findOne({where: {username: value}})
-        .then((result) => {
-          if(result)
-            return Promise.reject('Username already exists')
-        })
-    }),
   check('email')
     .notEmpty()
     .withMessage('Email is required').bail()
