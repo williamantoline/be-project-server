@@ -60,7 +60,13 @@ const login = async (req, res) => {
 
   const token = jwt.sign(user.toJSON(), process.env.JWT_KEY, { expiresIn: "1h" });
 
-  return res.json({token: token}).status(200);
+  res.cookie("token", token, {
+    httpOnly: true,
+    secure: true,
+    sameSite: "None"
+  });
+
+  return res.json({message: 'ok'});
 }
 
 const revoke = (req, res) => {
