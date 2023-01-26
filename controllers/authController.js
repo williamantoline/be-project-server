@@ -43,7 +43,7 @@ const login = async (req, res) => {
 
   if(!user){
     return res.status(403).json({
-      message: 'Username not Found',
+      message: 'Email not Found',
       error: "invalid login",
     })
   }
