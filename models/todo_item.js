@@ -7,10 +7,6 @@ module.exports = (sequelize, Sequelize) => {
             defaultValue: Sequelize.UUIDV4,
             primaryKey: true,
         },
-        order: {
-          type: Sequelize.INTEGER(8),
-          allowNull: false
-        },
         content: {
             type: Sequelize.STRING(255),
             allowNull: false

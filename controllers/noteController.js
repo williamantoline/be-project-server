@@ -1,7 +1,6 @@
 const model = require("../models/index");
 const jwt = require("jsonwebtoken");
 const Note = model.notes;
-const User = model.users;
 
 exports.index = async (req, res) => {
     const token = req.headers.authorization;
@@ -18,12 +17,13 @@ exports.show = async (req, res) => {
 exports.store = async (req, res) => {
     try {
         const { content } = req.body;
-        const user = await User.findOne();
+        const token = req.headers.authorization;
+        const user = jwt.verify(token, process.env.JWT_KEY);
         if (!user) {
             res.status(404).end();
         }
 
-        const note = await Note.create({userId: user.id, content, isLiked: false});
+        const note = await Note.create({ content, isLiked: false, userId: user.id});
         res.status(201).json({
             message: "Store note success",
             data: note,

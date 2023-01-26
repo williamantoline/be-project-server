@@ -18,16 +18,34 @@ exports.show = async (req, res) => {
     return res.status(200).json({data: todoItems});
 }
 
-exports.store = async (req, res) => {
+exports.storeFile = async (req, res) => {
     try {
         const { title } = req.body;
+        if(title === "") title = "Untitled"
         const user = await User.findOne();
         if (!user) {
             res.status(404).end();
         }
-        const todo = await Todo.create({ title, isLiked: false, userId: user.id,});
+        const todo = await Todo.create({ title, isLiked: false, userId: user.id });
         res.status(201).json({
-            message: "Store todo success",
+            message: "Store todo file success",
+            data: todo,
+        })
+    } catch (err) {
+        console.log(err)
+        res.status(500).end();
+    }
+}
+exports.storeTodo = async (req, res) => {
+    try {
+        const { content } = req.body;
+        const user = await User.findOne();
+        if (!user) {
+            res.status(404).end();
+        }
+        const todo = await Todo.create({ content, isChecked: false, todoId: req.params.id,});
+        res.status(201).json({
+            message: "Store todo file success",
             data: todo,
         })
     } catch (err) {
@@ -36,7 +54,7 @@ exports.store = async (req, res) => {
     }
 }
 
-exports.update = async (req, res) => {
+exports.updateTitle = async (req, res) => {
     try {
         const { id } = req.params;
         const { title } = req.body;
@@ -52,18 +70,34 @@ exports.update = async (req, res) => {
         res.status(500).end();
     }
 }
-
-exports.updateLike = async (req, res) => {
+exports.updateTodo = async (req, res) => {
     try {
         const { id } = req.params;
-        const { isLiked } = req.body;
+        const { content } = req.body;
+        const todoItem = await TodoItem.findOne({where: {id: id}});
+        todoItem.content = content;
+        todoItem.save();
+
+        res.status(200).json({
+            message: "Update todo list success",
+            data: todoItem,
+        })
+    } catch {
+        res.status(500).end();
+    }
+}
+
+exports.updateCheck = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { isChecked } = req.body;
         const todo = await Todo.findOne({where: {id: id}});
         if (!todo) {
             res.status(404).json({
                 message: "Todo not found"
             });
         }
-        todo.isLiked = isLiked;
+        todo.isChecked = isChecked;
         todo.save();
 
         res.status(200).json({
