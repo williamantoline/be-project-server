@@ -44,7 +44,7 @@ db.sequelize.sync()
 // main routing
 const testRoutes = require("./routes/test");
 const authRoutes = require("./routes/auth");
-const notesRoutes = require("./routes/notes")
+const notesRoutes = require("./routes/notes");
 app.use(testRoutes);
 app.use(authRoutes);
 app.use(notesRoutes);
