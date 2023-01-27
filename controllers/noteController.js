@@ -13,7 +13,17 @@ exports.index = async (req, res) => {
 }
 
 exports.show = async (req, res) => {
-    const note = await Note.findOne({where: {id: req.params.id}});
+    const token = req.headers.authorization;
+    if(!token){
+        return res.status(403).json({message: "Forbidden"})
+    }
+    const user = jwt.verify(token, process.env.JWT_KEY);
+    const note = await Note.findOne({
+        where: {
+            id: req.params.id,
+            userId: user.id,
+        }
+    });
     return res.status(200).json({data: note});
 }
 
