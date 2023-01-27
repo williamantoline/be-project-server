@@ -10,7 +10,11 @@ exports.index = async (req, res) => {
     }
     const user = jwt.verify(token, process.env.JWT_KEY);
     const todos = await Todo.findAll({
-        where: {userId: user.userId},
+        where: {userId: user.id},
+        include: [{
+            model: TodoItem,
+            as: "todo_items"
+        }]
     });
     return res.status(200).json({data: todos});
 }
@@ -23,13 +27,12 @@ exports.show = async (req, res) => {
 exports.storeFile = async (req, res) => {
     try {
         const { title } = req.body;
-        if(title === "") title = "Untitled"
         const token = req.headers.authorization;
         if(!token){
             return res.status(403).json({message: "Forbidden"})
         }
         const user = jwt.verify(token, process.env.JWT_KEY);
-        const todo = await Todo.create({ title, isLiked: false, userId: user.id });
+        const todo = await Todo.create({ title: title || "Untitled", isLiked: false, userId: user.id });
         res.status(201).json({
             message: "Store todo file success",
             data: todo,
@@ -42,10 +45,10 @@ exports.storeFile = async (req, res) => {
 exports.storeTodo = async (req, res) => {
     try {
         const { content } = req.body;
-        const todo = await Todo.create({ content, isChecked: false, todoId: req.params.id,});
+        const todoItem = await TodoItem.create({ content, isChecked: false, todoId: req.params.id});
         res.status(201).json({
             message: "Store todo list success",
-            data: todo,
+            data: todoItem,
         })
     } catch (err) {
         console.log(err)
@@ -58,7 +61,7 @@ exports.updateTitle = async (req, res) => {
         const { id } = req.params;
         const { title } = req.body;
         const todo = await Todo.findOne({where: {id: id}});
-        todo.title = title;
+        todo.title = title || "Untitled";
         todo.save();
 
         res.status(200).json({
@@ -86,17 +89,17 @@ exports.updateTodo = async (req, res) => {
     }
 }
 
-exports.updateCheck = async (req, res) => {
+exports.updateLike = async (req, res) => {
     try {
         const { id } = req.params;
-        const { isChecked } = req.body;
+        const { isLiked } = req.body;
         const todo = await Todo.findOne({where: {id: id}});
         if (!todo) {
             res.status(404).json({
                 message: "Todo not found"
             });
         }
-        todo.isChecked = isChecked;
+        todo.isLiked = isLiked;
         todo.save();
 
         res.status(200).json({
@@ -107,14 +110,47 @@ exports.updateCheck = async (req, res) => {
         res.status(500).end();
     }
 }
+exports.updateCheck = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { isChecked } = req.body;
+        const todoItem = await TodoItem.findOne({where: {id: id}});
+        if (!todoItem) {
+            res.status(404).json({
+                message: "Todo item not found"
+            });
+        }
+        todoItem.isChecked = isChecked;
+        todoItem.save();
+
+        res.status(200).json({
+            message: "Update is liked success",
+            data: todoItem,
+        });
+    } catch (err) {
+        res.status(500).end();
+    }
+}
 
 exports.destroy = async (req, res) => {
     try {
         const { id } = req.params;
-        await Todo.destroy({where: {id: id}});
         await TodoItem.destroy({where: {todoId: id}})
+        await Todo.destroy({where: {id: id}});
         res.status(200).json({
             message: "Delete todo success",
+        });
+    } catch {
+        res.status(500).end();
+    }
+}
+
+exports.destroyTodo = async (req, res) => {
+    try {
+        const { id } = req.params;
+        await TodoItem.destroy({where: {id: id}});
+        res.status(200).json({
+            message: "Delete todo list success",
         });
     } catch {
         res.status(500).end();
