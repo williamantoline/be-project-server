@@ -1,11 +1,13 @@
 const model = require("../models/index");
 const jwt = require("jsonwebtoken");
 const Todo = model.todos;
-const User = model.users;
 const TodoItem = model.todo_items
 
 exports.index = async (req, res) => {
     const token = req.headers.authorization;
+    if(!token){
+        return res.status(403).json({message: "Forbidden"})
+    }
     const user = jwt.verify(token, process.env.JWT_KEY);
     const todos = await Todo.findAll({
         where: {userId: user.userId},
@@ -22,10 +24,11 @@ exports.storeFile = async (req, res) => {
     try {
         const { title } = req.body;
         if(title === "") title = "Untitled"
-        const user = await User.findOne();
-        if (!user) {
-            res.status(404).end();
+        const token = req.headers.authorization;
+        if(!token){
+            return res.status(403).json({message: "Forbidden"})
         }
+        const user = jwt.verify(token, process.env.JWT_KEY);
         const todo = await Todo.create({ title, isLiked: false, userId: user.id });
         res.status(201).json({
             message: "Store todo file success",
@@ -39,13 +42,9 @@ exports.storeFile = async (req, res) => {
 exports.storeTodo = async (req, res) => {
     try {
         const { content } = req.body;
-        const user = await User.findOne();
-        if (!user) {
-            res.status(404).end();
-        }
         const todo = await Todo.create({ content, isChecked: false, todoId: req.params.id,});
         res.status(201).json({
-            message: "Store todo file success",
+            message: "Store todo list success",
             data: todo,
         })
     } catch (err) {

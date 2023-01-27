@@ -4,8 +4,10 @@ const Note = model.notes;
 
 exports.index = async (req, res) => {
     const token = req.headers.authorization;
+    if(!token){
+        return res.status(403).json({message: "Forbidden"})
+    }
     const user = jwt.verify(token, process.env.JWT_KEY);
-    console.log(user)
     const notes = await Note.findAll({ where: {userId: user.id} });
     return res.status(200).json({data: notes});
 }
@@ -19,6 +21,9 @@ exports.store = async (req, res) => {
     try {
         const { content } = req.body;
         const token = req.headers.authorization;
+        if(!token){
+            return res.status(403).json({message: "Forbidden"})
+        }
         const user = jwt.verify(token, process.env.JWT_KEY);
         if (!user) {
             res.status(404).end();

@@ -12,10 +12,7 @@ const getUser = async (email) => {
 }
 
 const cookieJwtAuth = (req, res) => {
-  console.log(req.headers)
   const token = req.headers.authorization;
-  console.log(token)
-  console.log('CheckToken Active')
   if(!token){
     return res.json({tokenStatus: false}).status(200);
   }else{
