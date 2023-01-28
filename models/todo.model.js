@@ -11,10 +11,6 @@ module.exports = (sequelize, Sequelize) => {
             type: Sequelize.STRING(255),
             allowNull: false,
         },
-        isLiked: {
-            type: Sequelize.BOOLEAN,
-            allowNull: false
-        }
     });
     return Todo;
 }

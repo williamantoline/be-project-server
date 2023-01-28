@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken");
 const File = model.files;
 const Note = model.notes;
 const Todo = model.todos;
+const TodoItem = model.todo_items;
 const FilableType = require("../models/enums/FilableType");
 
 
@@ -39,8 +40,19 @@ exports.show = async (req, res) => {
         });
     }
 
+    let fileResource = file;
+    if (file.filableType === FilableType.todo) {
+        const todoItems = await TodoItem.findAll({
+            where: {
+                todoId: file.filableId,
+            }
+        });
+        const todoResource = {...file.todo.dataValues, todoItems: todoItems};
+        fileResource = {...file.dataValues, todo: todoResource};
+    }
+
     return res.status(200).json({
-        data: file
+        data: fileResource,
     });
 }
 
@@ -133,7 +145,6 @@ exports.update = async (req, res) => {
                 ...file.dataValues,
                 filable: note,
             };
-            console.log(resource);
 
             res.status(201).json({
                 message: "Update file success",
@@ -141,6 +152,59 @@ exports.update = async (req, res) => {
             });
         } 
 
+    } catch (err) {
+        res.status(500).end();
+    }
+}
+
+
+exports.updateTitle = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { title } = req.body;
+
+        const file = await File.findOne({
+            where: {
+                id: id
+            }
+        });
+        file.title = title || "Untitled";
+        file.save();
+
+        res.status(200).json({
+            message: "Update title success",
+            data: file,
+        });
+    } catch (err) {
+        throw err;
+        res.status(500).end();
+    }
+}
+
+
+exports.updateLike = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { isLiked } = req.body;
+        const file = await File.findOne({
+            where: {
+                id: id,
+                userId: req.user.id,
+            }
+        });
+
+        if (!file) {
+            res.status(404).json({
+                message: "file not found"
+            });
+        }
+        file.isLiked = isLiked;
+        file.save();
+
+        res.status(200).json({
+            message: "Update is liked success",
+            data: file,
+        });
     } catch (err) {
         res.status(500).end();
     }
@@ -183,6 +247,188 @@ exports.destroy = async (req, res) => {
         });
     } catch (err) {
         throw err;
+        res.status(500).end();
+    }
+}
+
+
+exports.addTodoItem = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { content } = req.body;
+
+        const file = await File.findOne({
+            where: {
+                id: id,
+                userId: req.user.id,
+                filableType: FilableType.todo,
+            },
+            include: [Todo],
+        });
+        if (!file) {
+            return res.status(404).json({
+                message: "not found",
+            });
+        }
+
+        const todo = file.todo;
+        const todoItem = await TodoItem.create({
+            todoId: todo.id,
+            content, 
+            isChecked: false, 
+        });
+
+        const todoItems = await TodoItem.findAll({
+            where: {
+                todoId: file.filableId,
+            }
+        });
+        const todoResource = {...file.todo.dataValues, todoItems: todoItems};
+        fileResource = {...file.dataValues, todo: todoResource};
+
+        res.status(201).json({
+            message: "Store todo list success",
+            data: todoItems,
+        });
+    } catch (err) {
+        res.status(500).end();
+    }
+}
+
+
+exports.editTodoItem = async (req, res) => {
+    try {
+        const { fileId, todoItemId } = req.params;
+        const { content } = req.body;
+
+        const file = await File.findOne({
+            where: {
+                id: fileId,
+                filableType: FilableType.todo,
+            },
+            include: [Todo],
+        });
+        if (!file) {
+            return res.status(404).json({
+                message: "not found",
+            });
+        }
+
+        const todo = file.todo;
+        const todoItem = await TodoItem.findOne({
+            where: {
+                todoId: todo.id,
+                id: todoItemId,
+            }
+        });
+        todoItem.content = content;
+        todoItem.save();
+
+
+        const todoItems = await TodoItem.findAll({
+            where: {
+                todoId: file.filableId,
+            }
+        });
+        const todoResource = {...file.todo.dataValues, todoItems: todoItems};
+        fileResource = {...file.dataValues, todo: todoResource};
+
+        res.status(200).json({
+            message: "edit todo list success",
+            data: todoItems,
+        });
+    } catch (err) {
+        res.status(500).end();
+    }
+}
+
+
+exports.editTodoItemCheck = async (req, res) => {
+    try {
+        const { fileId, todoItemId } = req.params;
+        const { isChecked } = req.body;
+
+        const file = await File.findOne({
+            where: {
+                id: fileId,
+                filableType: FilableType.todo,
+            },
+            include: [Todo],
+        });
+        if (!file) {
+            return res.status(404).json({
+                message: "not found",
+            });
+        }
+
+        const todo = file.todo;
+        const todoItem = await TodoItem.findOne({
+            where: {
+                todoId: todo.id,
+                id: todoItemId,
+            }
+        });
+        todoItem.isChecked = isChecked;
+        todoItem.save();
+
+
+        const todoItems = await TodoItem.findAll({
+            where: {
+                todoId: file.filableId,
+            }
+        });
+        const todoResource = {...file.todo.dataValues, todoItems: todoItems};
+        fileResource = {...file.dataValues, todo: todoResource};
+
+        res.status(200).json({
+            message: "edit todo list success",
+            data: todoItems,
+        });
+    } catch (err) {
+        throw err;
+        res.status(500).end();
+    }
+}
+
+
+exports.deleteTodoItem = async (req, res) => {
+    try {
+        const { fileId, todoItemId } = req.params;
+
+        const file = await File.findOne({
+            where: {
+                id: fileId,
+                filableType: FilableType.todo,
+            },
+            include: [Todo],
+        });
+        if (!file) {
+            return res.status(404).json({
+                message: "not found",
+            });
+        }
+
+        const todo = file.todo;
+        await TodoItem.destroy({
+            where: {
+                todoId: todo.id,
+                id: todoItemId,
+            }
+        });
+
+        const todoItems = await TodoItem.findAll({
+            where: {
+                todoId: file.filableId,
+            }
+        });
+        const todoResource = {...file.todo.dataValues, todoItems: todoItems};
+        fileResource = {...file.dataValues, todo: todoResource};
+
+        res.status(200).json({
+            message: "delete todo list success",
+            data: todoItems,
+        });
+    } catch (err) {
         res.status(500).end();
     }
 }

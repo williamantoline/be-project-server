@@ -16,10 +16,6 @@ app.use(cors({
 
 app.use(express.json());
 
-
-// const conn = require("./db");
-// conn.connect();
-
 const db = require("./models");
 
 db.sequelize.sync()
@@ -44,16 +40,10 @@ db.sequelize.sync()
 
 
 // main routing
-// const testRoutes = require("./routes/test");
 const authRoutes = require("./routes/auth");
 const fileRoutes = require("./routes/file");
-// const noteRoutes = require("./routes/note");
-// const todoRoutes = require("./routes/todo");
-// app.use(testRoutes);
 app.use(authRoutes);
 app.use(authMid, fileRoutes);
-// app.use(noteRoutes);
-// app.use(todoRoutes);
 
 // handle 404
 app.use((req, res, next) => {
