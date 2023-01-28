@@ -8,7 +8,7 @@ exports.validateUser = [
     .isLength({ min: 3, max: 255 })
     .withMessage('Name must have a minimum length of 3').bail()
     .isAlpha()
-    .withMessage("The name should contain only letters").bail(),
+    .withMessage("Name should contain only letters").bail(),
   check('email')
     .notEmpty()
     .withMessage('Email is required').bail()
