@@ -322,8 +322,7 @@ exports.editTodoItem = async (req, res) => {
             }
         });
         todoItem.content = content;
-        todoItem.save();
-
+        await todoItem.save();
 
         const todoItems = await TodoItem.findAll({
             where: {
@@ -409,12 +408,13 @@ exports.deleteTodoItem = async (req, res) => {
         }
 
         const todo = file.todo;
-        await TodoItem.destroy({
+        const todoItem = await TodoItem.findOne({
             where: {
                 todoId: todo.id,
                 id: todoItemId,
             }
         });
+        todoItem.destroy();
 
         const todoItems = await TodoItem.findAll({
             where: {
