@@ -21,26 +21,32 @@ const cookieJwtAuth = (req, res) => {
 }
 
 const register = async (req, res) => {
-  const { name, email, password } = req.body;
-  const saltRounds = 10;
-  bcrypt.hash(password, saltRounds, async (err, password) => {
-    if(err){
-      return res.send("Gagal Menambahkan Data User").status(400);
-    }
-    if(password){
-      await model.users.create({name, email, password});
-      return res.send("Berhasil Menambahkan Data User").status(200);
-    }
-  });
+  try {
+    const { name, email, password } = req.body;
+    console.log("abc")
+    const saltRounds = 10;
+    bcrypt.hash(password, saltRounds, async (err, password) => {
+      if(err){
+        return res.send("Gagal Menambahkan Data User").status(400);
+      }
+      if(password){
+        await model.users.create({name, email, password});
+        return res.send("Berhasil Menambahkan Data User").status(200);
+      }
+    });
+  } catch (err) {
+    return res.status(500).end();
+  }
 }
 
 const login = async (req, res) => {
-  const { email, password } = req.body;
+  try {
+    const { email, password } = req.body;
   let user = await getUser(email);
 
   if(!user){
     return res.status(403).json({
-      message: 'Email not Found',
+      message: 'invalid credentials',
       error: "invalid login",
     })
   }
@@ -48,7 +54,7 @@ const login = async (req, res) => {
   const status = await bcrypt.compare(password, user.password)
   if(!status){
     return res.status(403).json({
-      message: 'Wrong Password',
+      message: 'invalid credentials',
       error: 'invalid login'
     })
   }
@@ -62,6 +68,10 @@ const login = async (req, res) => {
   });
 
   return res.json({token: token});
+  
+  } catch (err) {
+    res.status(500).end();
+  }
 }
 
 const revoke = (req, res) => {
