@@ -14,6 +14,7 @@ exports.index = async (req, res) => {
                 userId: req.user.id
             },
             include: [Note, Todo],
+            order: [['createdAt', 'DESC']]
         });
         
         return res.status(200).json({
@@ -45,7 +46,8 @@ exports.show = async (req, res) => {
         const todoItems = await TodoItem.findAll({
             where: {
                 todoId: file.filableId,
-            }
+            },
+            order: [['createdAt', 'DESC']]
         });
         const todoResource = {...file.todo.dataValues, todoItems: todoItems};
         fileResource = {...file.dataValues, todo: todoResource};
@@ -65,7 +67,6 @@ exports.store = async (req, res) => {
 
             const note = await Note.create({
                 content: content,
-
             });
 
             const file = await File.create({
@@ -234,6 +235,11 @@ exports.destroy = async (req, res) => {
                 }
             });
         } else if (file.filableType === FilableType.todo) {
+            await TodoItem.destroy({
+                where: {
+                    todoId: file.filableId,
+                }
+            })
             await Todo.destroy({
                 where: {
                     id: file.filableId,
@@ -281,7 +287,8 @@ exports.addTodoItem = async (req, res) => {
         const todoItems = await TodoItem.findAll({
             where: {
                 todoId: file.filableId,
-            }
+            },
+            order: [['createdAt', 'DESC']]
         });
         const todoResource = {...file.todo.dataValues, todoItems: todoItems};
         fileResource = {...file.dataValues, todo: todoResource};
@@ -322,12 +329,14 @@ exports.editTodoItem = async (req, res) => {
             }
         });
         todoItem.content = content;
-        await todoItem.save();
+        todoItem.save();
+
 
         const todoItems = await TodoItem.findAll({
             where: {
                 todoId: file.filableId,
-            }
+            },
+            order: [['createdAt', 'DESC']]
         });
         const todoResource = {...file.todo.dataValues, todoItems: todoItems};
         fileResource = {...file.dataValues, todo: todoResource};
@@ -374,7 +383,8 @@ exports.editTodoItemCheck = async (req, res) => {
         const todoItems = await TodoItem.findAll({
             where: {
                 todoId: file.filableId,
-            }
+            },
+            order: [['createdAt', 'DESC']]
         });
         const todoResource = {...file.todo.dataValues, todoItems: todoItems};
         fileResource = {...file.dataValues, todo: todoResource};
@@ -408,18 +418,18 @@ exports.deleteTodoItem = async (req, res) => {
         }
 
         const todo = file.todo;
-        const todoItem = await TodoItem.findOne({
+        await TodoItem.destroy({
             where: {
                 todoId: todo.id,
                 id: todoItemId,
             }
         });
-        todoItem.destroy();
 
         const todoItems = await TodoItem.findAll({
             where: {
                 todoId: file.filableId,
-            }
+            },
+            order: [['createdAt', 'DESC']]
         });
         const todoResource = {...file.todo.dataValues, todoItems: todoItems};
         fileResource = {...file.dataValues, todo: todoResource};
